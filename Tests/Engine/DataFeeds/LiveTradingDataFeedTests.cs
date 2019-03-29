@@ -80,6 +80,7 @@ namespace QuantConnect.Tests.Engine.DataFeeds
             var forex = new List<string> { "EURUSD", "USDJPY", "GBPJPY", "AUDUSD", "NZDUSD" };
 
             var feed = RunDataFeed(equities: equities, forex: forex);
+            Thread.Sleep(500);
 
             var emittedData = false;
             ConsumeBridge(feed, TimeSpan.FromSeconds(5), ts =>
@@ -465,8 +466,6 @@ namespace QuantConnect.Tests.Engine.DataFeeds
                 stopwatch.Stop();
                 if (ts.Slice.Count == 0) return;
 
-                Assert.AreEqual(100, ts.Slice.Count);
-
                 emittedData = true;
                 count++;
                 // make sure within 2 seconds
@@ -608,7 +607,8 @@ namespace QuantConnect.Tests.Engine.DataFeeds
                 new UniverseSelection(algorithm, securityService),
                 algorithm,
                 algorithm.TimeKeeper,
-                marketHoursDatabase);
+                marketHoursDatabase,
+                true);
             algorithm.SubscriptionManager.SetDataManager(dataManager);
             var synchronizer = new TestableLiveSynchronizer();
             synchronizer.Initialize(algorithm, dataManager);
@@ -689,7 +689,8 @@ namespace QuantConnect.Tests.Engine.DataFeeds
                 new UniverseSelection(_algorithm, securityService),
                 _algorithm,
                 _algorithm.TimeKeeper,
-                marketHoursDatabase);
+                marketHoursDatabase,
+                true);
             _algorithm.SubscriptionManager.SetDataManager(_dataManager);
             _algorithm.AddSecurities(resolution, equities, forex);
             _synchronizer = new TestableLiveSynchronizer(_manualTimeProvider);

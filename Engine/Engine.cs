@@ -142,7 +142,8 @@ namespace QuantConnect.Lean.Engine
                             securityService),
                         algorithm,
                         algorithm.TimeKeeper,
-                        marketHoursDatabase);
+                        marketHoursDatabase,
+                        _liveMode);
 
                     _algorithmHandlers.Results.SetDataManager(dataManager);
                     algorithm.SubscriptionManager.SetDataManager(dataManager);
