@@ -369,6 +369,8 @@ namespace QuantConnect.Lean.Engine.DataFeeds
         /// <param name="request">The subscription request</param>
         private Subscription CreateUniverseSubscription(SubscriptionRequest request)
         {
+            Subscription subscription = null;
+
             // TODO : Consider moving the creating of universe subscriptions to a separate, testable class
 
             // grab the relevant exchange hours
@@ -412,6 +414,8 @@ namespace QuantConnect.Lean.Engine.DataFeeds
                         var collection = new BaseDataCollection(currentFrontierUtcTime, symbol);
                         var changes = _universeSelection.ApplyUniverseSelection(userDefined, currentFrontierUtcTime, collection);
                         _algorithm.OnSecuritiesChanged(changes);
+
+                        subscription.OnNewDataAvailable();
                     };
                 }
             }
@@ -427,6 +431,9 @@ namespace QuantConnect.Lean.Engine.DataFeeds
                 _exchange.SetDataHandler(config.Symbol, data =>
                 {
                     enqueable.Enqueue(data);
+
+                    subscription.OnNewDataAvailable();
+
                 });
                 enumerator = enqueable;
             }
@@ -493,7 +500,7 @@ namespace QuantConnect.Lean.Engine.DataFeeds
 
             // create the subscription
             var subscriptionDataEnumerator = SubscriptionData.Enumerator(request.Configuration, request.Security, tzOffsetProvider, enumerator);
-            var subscription = new Subscription(request, subscriptionDataEnumerator, tzOffsetProvider);
+            subscription = new Subscription(request, subscriptionDataEnumerator, tzOffsetProvider);
 
             return subscription;
         }
